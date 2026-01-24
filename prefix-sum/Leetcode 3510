@@ -1,0 +1,112 @@
+# Problem Name
+3510. Minimum Pair Removal to Sort Array II
+🔗 Link: https://leetcode.com/problems/minimum-pair-removal-to-sort-array-ii/description/?envType=daily-question&envId=2026-01-24
+🏷 Platform: LeetCode  
+⭐ Difficulty: 900–1400  
+
+## Core Idea
+Alter the array with the minimum sum
+Return the minimum number of operations needed to make the array non-decreasing.
+
+
+## Key Observation
+We cannot do the brute force using erase(arr.begin()+ind) to remove the element as it takes O(n) and total will take O(n^2)
+
+## Mistakes I Made
+Brute force will not work
+
+## Pattern / Reuse
+We need a linked list type of data structure for removing the retarded number and each time we need to find the smallest adjacent sum 
+So,we used a array for tracking the left and right index of adjacent numbers and then used a priority queue of pairs for getting the smallest adjacent sum with its index
+
+## Final Solution
+class Solution {
+public:
+    typedef long long ll;
+
+    int minimumPairRemoval(vector<int>& nums) {
+        int n = nums.size();
+
+        //{a, b, c, d} --> {a, b+c, d}
+        vector<ll> temp(n);
+        for(int i = 0; i < n; i++)
+            temp[i] = nums[i];
+
+        set<pair<ll, int>> minPairSet;
+
+        vector<int> nextIndex(n);
+        vector<int> prevIndex(n);
+
+        for(int i = 0; i < n; i++) {
+            nextIndex[i] = i+1;
+            prevIndex[i] = i-1;
+        }
+
+        int badPairs = 0;
+        for(int i = 0; i < n-1; i++) {
+            if(temp[i] > temp[i+1]) {
+                badPairs++;
+            }
+            minPairSet.insert({temp[i] + temp[i+1], i});
+        }
+
+        int operations = 0;
+
+        while(badPairs > 0) {
+            int first  = minPairSet.begin()->second;
+            int second = nextIndex[first];
+
+            int first_left   = prevIndex[first];
+            int second_right = nextIndex[second];
+
+
+            minPairSet.erase(begin(minPairSet));
+
+            if(temp[first] > temp[second]) {
+                badPairs--;
+            }
+
+            //{d, (a, b)}
+            if(first_left >= 0) {
+                if(temp[first_left] > temp[first] &&
+                temp[first_left] <= temp[first] + temp[second]) {
+                    badPairs--;
+                } 
+                else if(temp[first_left] <= temp[first] &&
+                temp[first_left] > temp[first] + temp[second]) {
+                    badPairs++;
+                }
+            }
+
+            //{(a, b), d}
+            if (second_right < n) {
+                if (temp[second_right] >= temp[second] &&
+                    temp[second_right] < temp[first] + temp[second]) {
+                    badPairs++;
+                }
+                else if (temp[second_right] < temp[second] &&
+                         temp[second_right] >= temp[first] + temp[second]) {
+                    badPairs--;
+                }
+            }
+
+            if(first_left >= 0) {
+                minPairSet.erase({temp[first_left] + temp[first], first_left});
+                minPairSet.insert({temp[first_left] + temp[first] + temp[second], first_left});
+            }
+
+            if(second_right < n) {
+                minPairSet.erase({temp[second] + temp[second_right], second});
+                minPairSet.insert({temp[first] + temp[second] + temp[second_right], first});
+                prevIndex[second_right] = first;
+            }
+
+            nextIndex[first] = second_right;
+            temp[first] += temp[second];
+
+            operations++;
+        }
+
+        return operations;
+    }
+};
