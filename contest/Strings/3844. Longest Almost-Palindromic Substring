@@ -1,209 +1,94 @@
 3844. Longest Almost-Palindromic Substring
-
 From Weekly Contest 489
+link: https://leetcode.com/problems/longest-almost-palindromic-substring/description/
 
-🔎 Problem Understanding
+Problem Understanding
+Example 1:
 
-A substring is almost-palindromic if:
+Input: s = "abca"
 
-You remove exactly one character
+Output: 4
 
-The remaining string becomes a palindrome
+Explanation:
 
-👉 So we must:
+Choose the substring "abca".
 
-Choose a substring
+    Remove "abca".
+    The string becomes "aba", which is a palindrome.
+    Therefore, "abca" is almost-palindromic.
 
-Remove one character
 
-Check if what's left is a palindrome
 
-Return the maximum possible length of such a substring.
-
-💡 Key Idea (Greedy + Expand Around Center)
-
-Since palindrome problems usually use:
-
+Key Idea 
 “Fix center → expand outward”
 
-We do the same here, but with one allowed skip.
-
-For every center:
-
-Try expanding normally
-
 On first mismatch:
-
 Try skipping left character
-
 Try skipping right character
-
 Continue expanding
-
 Track maximum length
-
 We must check:
-
 Odd-length centers
-
 Even-length centers
 
-🧩 Why This Works
-
-For any substring:
-
-If removing one character makes it palindrome,
-then while expanding from center, you’ll encounter:
-
-Either perfect matches
-
-Or exactly one mismatch
-
-At that mismatch:
-
-Skip left OR skip right
-
-Continue expanding
-
-If more than one mismatch occurs → invalid
-
-⏱ Complexity
-
-We check n centers
-
-Each expansion is O(n)
-
 Total = O(n²)
-
 Works for n ≤ 2500
 
-✅ Clean Implementation (Contest Format)
+Error in thinking:
+1. I was doing && instead of || it fails as when mismatch is at corner && fails so in code we only match when both i and j are in range and increase 2 and if 
+skip is there increase one and decrease skip --good approach from atmost palindrome problem 
+2. I was doing j-- for left shift ,see for left shift we have to skip the current left character for that do k-- so when in next iteration j--,k++ 
+happen we have bypassed left character == good one
+
+Code
 class Solution {
 public:
     int almostPalindromic(string s) {
-        int n = s.size();
-        int ans = 2;  // minimum valid length
-        
-        for(int i = 0; i < n; i++) {
-            
-            // ---------- ODD LENGTH ----------
-            
-            // Skip left
-            int l = 1, skip = 1;
-            for(int j = i-1, k = i+1; j >= 0 && k < n; j--, k++) {
-                if(s[j] == s[k]) {
-                    l += 2;
-                } 
-                else if(skip) {
-                    j++;      // undo j--
-                    l++;      
-                    skip--;
-                } 
+        int ans=2;
+        int n=s.size();
+        for(int i=0;i<n;i++)
+        {
+            int l=1,skip=1;
+            //odd length
+            for(int j=i-1,k=i+1;j>=0||k<n;j--,k++)
+            {
+                if(j>=0 && k<n && s[j]==s[k])
+                {
+                l+=2;
+                }else if(skip)j++,l++,skip--;//skip right
                 else break;
             }
-            ans = max(ans, l);
-            
-            // Skip right
-            l = 1;
-            skip = 1;
-            for(int j = i-1, k = i+1; j >= 0 && k < n; j--, k++) {
-                if(s[j] == s[k]) {
-                    l += 2;
-                } 
-                else if(skip) {
-                    k--;      // undo k++
-                    l++;
-                    skip--;
-                } 
+            ans=max(ans,l);l=1;skip=1;
+            for(int j=i-1,k=i+1;j>=0||k<n;j--,k++)
+            {
+                if(j>=0 && k<n &&s[j]==s[k])l+=2;
+                else if(skip)k--,l++,skip--;//skip left
                 else break;
             }
-            ans = max(ans, l);
-            
-            
-            // ---------- EVEN LENGTH ----------
-            
-            // Skip left
-            l = 0;
-            skip = 1;
-            for(int j = i, k = i+1; j >= 0 && k < n; j--, k++) {
-                if(s[j] == s[k]) {
-                    l += 2;
-                } 
-                else if(skip) {
-                    j++;
-                    l++;
-                    skip--;
-                } 
+            ans=max(ans,l);
+            //even length
+            l=0;
+            skip=1;
+            for(int j=i,k=i+1;j>=0||k<n;j--,k++)
+            {
+                if(j>=0 && k<n &&s[j]==s[k])l+=2;
+                else if(skip)j++,l++,skip--;// skip right
                 else break;
             }
-            ans = max(ans, l);
-            
-            
-            // Skip right
-            l = 0;
-            skip = 1;
-            for(int j = i, k = i+1; j >= 0 && k < n; j--, k++) {
-                if(s[j] == s[k]) {
-                    l += 2;
-                } 
-                else if(skip) {
-                    k--;
-                    l++;
-                    skip--;
-                } 
+           
+            ans=max(ans,l);
+            skip=1;
+            l=0;
+            for(int j=i,k=i+1;j>=0||k<n;j--,k++)
+            {
+                if(j>=0 && k<n &&s[j]==s[k])l+=2;
+                else if(skip)k--,l++,skip--;//skip left
                 else break;
             }
-            ans = max(ans, l);
+            
+            ans=max(ans,l);
         }
-        
         return ans;
     }
 };
-
-🧠 Example Walkthrough
-Example: "abca"
-
-Center at b
-
-Compare:
-
-a   c
-
-
-Mismatch.
-
-Try:
-
-Skip left → remove 'a'
-
-Skip right → remove 'c'
-
-Skipping c gives "aba" → palindrome ✅
-
-Length = 4
-
-🎯 Why Many Got TLE
-
-Common mistakes:
-
-Trying all substrings → O(n³)
-
-Checking palindrome after removing each char → O(n³)
-
-Using recursion without pruning
-
-The greedy center-expansion approach keeps it O(n²).
-
-🏁 Final Thoughts
-
-This problem:
-
-Looks like normal palindrome
-
-But “exactly one removal” makes it tricky
-
-Requires careful pointer handling
-
-Classic contest brain-bender 😅
-
 If you want, I can also show a cleaner refactored version using a helper function to reduce repetition.
