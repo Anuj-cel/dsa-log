@@ -23,3 +23,6 @@ public:
         return ans;
     }
 };
+
+
+Take away= n&(n-1)==0 for only bit increases like  1 2 , 3 4, 7 8
