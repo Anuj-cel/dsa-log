@@ -3,6 +3,11 @@ To do:
 make the 1 to n numbers binary then concatenate and return its value 
 1 <= n <= 10^5
   M=10^9+7
+
+Trick:
+ans = ans << (bits of i)
+ans = ans + i
+
   code:
   class Solution {
 public:
