@@ -1,4 +1,5 @@
 1680. Concatenation of Consecutive Binary Numbers
+link: https://leetcode.com/problems/concatenation-of-consecutive-binary-numbers/description/?envType=daily-question&envId=2026-03-11
 To do:
 make the 1 to n numbers binary then concatenate and return its value 
 1 <= n <= 10^5
