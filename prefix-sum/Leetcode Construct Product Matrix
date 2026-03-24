@@ -1,0 +1,8 @@
+link: https://leetcode.com/problems/construct-product-matrix/
+2906. Construct Product Matrix
+
+Each element p[i][j] is calculated as the product of all elements in grid except for the element grid[i][j]. This product is then taken modulo 12345.
+
+algo: making a prefix and suffix array of matrix ,1d arrays
+  row=i/col
+  col=i%col
